@@ -29,18 +29,98 @@ Reader.mainPage = SC.Page.design({
 
 		
 		 middleView: SC.View.design({
+			touchStart:function(event){
+				console.log("[mouse down] " + event.pageX);
+				console.log("[mouse down] " + event.screenX);
+				return YES;
+			},
+			
+			touchesDragged: function(event, touches){
+				console.log("[dragged] " + event.pageX);
+				console.log("[dragged] "+ event.screenX);
+				console.log(this);
+				this.imageView.set("screenX", event.screenX);
+				this.imageView.adjust("right", event.screenX);
+				
+				return false;
+			},
+			
+			touchEnd: function(event){
+			//	alert('touch up');
+				console.log("[up] " + event.pageX);
+				console.log("[up] " + event.pageY);
+				if(event.pageX < 156)
+					Reader.pagesController.previous();
+				if(event.pageX > 230)	
+					Reader.pagesController.next();
+				return false;
+			},
+			
+			mouseDown:function(event){
+			//	for(property in event){
+			//		console.log(property);
+			//	}
+				
+			console.log("[mouse down] " + event.pageX);
+			console.log("[mouse down] " + event.screenX);
+			return YES;	
+				
+			},
+			
+			mouseDragged: function(event){				
+				console.log("[dragged] " + event.pageX);
+				console.log("[dragged] "+ event.screenX);
+				console.log(this);
+				this.imageView.set("screenX", event.screenX);
+				this.imageView.adjust("right", event.screenX);
+				return false;
+			},
+			
+			mouseUp: function(event){
+			//	alert('mouse up');
+				console.log("[up] " + event.pageX);
+				console.log("[up] " + event.pageY);
+				if(event.pageX < 156)
+					Reader.pagesController.previous();
+					
+				if(event.pageX > 300)	
+					Reader.pagesController.next();
+					
+				return false;
+			},
+			
 			layout:{ top:50, bottom:50, left:50, right:50},
 			backgroundColor:'lightGray',
 			anchorLocation:SC.ANCHOR_CENTER,
-			childViews: 'imageView'.w(),
+			childViews: 'imageView addLeftButtonView addRightButtonView'.w(),
 			
-			imageView: SC.ImageView.design({
+			imageView: SC.ImageView.design(SC.Animatable,{
+				transitions : {
+					left: {duration:0.5, timing: SC.Animatable.TRANSITION_EASE_IN_OUT },
+					opacity: { duration:2, timing:SC.Animatable.TRANSITION_EASE_IN_OUT},
+					display: 0.75					
+				},
 				layout: {top:50, bottom:50, left:50, right:50},
 				anchorLocation:SC.ANCHOR_CENTER,
 				backgroundColor:'white',
-     	        value: '/../agile_ref.pdf',
+     	        value: sc_static('images/lightsaber.jpg'),
+				canLoadInBackground: true,
 	            useImageCache: NO
+				
+			}).bind('value', 'Reader.pagesController.current_page'),
+			
+			addLeftButtonView: SC.ButtonView.design({
+					layout:{ left:40, top:500, width:100},
+					title: 'Back',
+					target: 'Reader.pagesController',
+					action: 'Reader.pagesController.previous'					
 			}),
+			
+			addRightButtonView:SC.ButtonView.design({
+				layout: {left:490,top:500, width:100},
+				title: 'Right'
+			}),
+			
 			
 	      }),
 
